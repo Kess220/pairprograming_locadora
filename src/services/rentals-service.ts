@@ -34,7 +34,7 @@ async function createRental(rentalInput: RentalInput) {
 	const user = await getUserForRental(userId);
 	await checkUserAbleToRental(userId);
 	await checkMoviesValidForRental(moviesId, user);
-
+	
 	const rental = await rentalsRepository.createRental(rentalInput);
 	return rental;
 }

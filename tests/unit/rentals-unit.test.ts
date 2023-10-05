@@ -4,38 +4,35 @@ import { cleanDb } from "../utils";
 import moviesRepository from "repositories/movies-repository";
 import { RentalInput } from "protocols";
 import rentalsService from "services/rentals-service";
+import rentalsRepository from "../../src/repositories/rentals-repository";
+import { Rental } from "@prisma/client";
 beforeEach(async () => await cleanDb());
 describe("Rentals Service Unit Tests", () => {
 	it("should do something", async () => {
-		const movies = await prisma.movie.createMany({
-			data: [
-				{ id: 1, adultsOnly: false, name: "Movie 1" },
-				{ id: 2, adultsOnly: false, name: "Movie 2" },
-				{ id: 3, adultsOnly: false, name: "Movie 3" },
-				{ id: 4, adultsOnly: false, name: "Movie 4" },
-				{ id: 5, adultsOnly: false, name: "Movie 5" },
-			],
-		});
-
-		const user = await prisma.user.create({
-			data: {
-				firstName: "CNPJOTO",
-				lastName: "ARARAQUARO",
-				birthDate: new Date(1998, 6, 12),
-				cpf: "00000000000",
-				email: "cnpjoto.araraquaro@gmail.com",
-			},
-		});
-
-		const spyCreaterental = jest.spyOn(repository, "createRental");
-
-		await repository.createRental({ moviesId: [1], userId: user.id });
-
-		const rentals = await repository.getRentalsByUserId(user.id, false);
-
-		expect(rentals[0].id).toBeGreaterThan(0);
+		jest.spyOn(rentalsRepository,"getRentalById").mockImplementation(():any=>
+		{
+			const rental:Rental  = 
+			{
+				id:4,
+				closed:false,
+				date:new Date('1998-05-29'),
+				endDate:new Date("2005-05-29"),
+				userId:null
+			}
+			return rental
+		})
+		const service = await rentalsService.getRentalById(4)
+		expect(service).toEqual({
+			id:4,
+			closed:false,
+			date:new Date('1998-05-29'),
+			endDate:new Date("2005-05-29"),
+			userId:null
+		})
+		
 	});
 	it("should not create a rental with more than 4 movies", async () => {
+		//jest.spyOn(rentalsRepository,"")
 		const movies = await prisma.movie.createMany({
 			data: [
 				{ id: 1, adultsOnly: false, name: "Movie 1" },
@@ -179,4 +176,5 @@ describe("Rentals Service Unit Tests", () => {
 				message:"Movie already in a rental."
 			})
 	})
+	
 });
